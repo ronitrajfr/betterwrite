@@ -9,9 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "dexie": "^4.2.1",
+    "lucide-react": "^0.561.0",
     "next": "16.0.10",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "use-debounce": "^10.0.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
