@@ -7,7 +7,7 @@ import { useDebounce } from "use-debounce";
 
 const FONTS = ["Lato", "Arial", "System", "Serif", "Random"];
 
-export default function FreewritePage() {
+export default function betterwriteDB() {
   const [fontSize, setFontSize] = useState(18);
   const [selectedFont, setSelectedFont] = useState("Lato");
   const [currentTime, setCurrentTime] = useState(new Date());
