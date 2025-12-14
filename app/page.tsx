@@ -1363,34 +1363,34 @@ export default function BetterWriteDB() {
                         }`}
                         style={{ animationDelay: `${index * 30}ms` }}
                       >
-                        <button
-                          onClick={() => loadNote(note)}
-                          className={`w-full px-3 py-2.5 text-left transition-colors rounded-md ${
+                        <div
+                          className={`flex items-start justify-between gap-2 w-full px-3 py-2.5 transition-colors rounded-md ${
                             isActive ? "" : hoverBg
                           }`}
                         >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div
-                                className={`text-sm truncate mb-0.5 ${
-                                  isActive ? textColor : textColor
-                                }`}
-                              >
-                                {note.title || "Untitled"}
-                              </div>
-                              <div className={`text-xs ${mutedTextColor}`}>
-                                {getRelativeTime(new Date(note.updatedAt))}
-                              </div>
-                            </div>
-                            <button
-                              onClick={(e) => deleteNote(note.id!, e)}
-                              className={`rounded-md p-1 opacity-0 transition-all group-hover:opacity-100 ${mutedTextColor} hover:text-red-500`}
-                              title="Delete note"
+                          <button
+                            onClick={() => loadNote(note)}
+                            className="flex-1 min-w-0 text-left"
+                          >
+                            <div
+                              className={`text-sm truncate mb-0.5 ${
+                                isActive ? textColor : textColor
+                              }`}
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </button>
+                              {note.title || "Untitled"}
+                            </div>
+                            <div className={`text-xs ${mutedTextColor}`}>
+                              {getRelativeTime(new Date(note.updatedAt))}
+                            </div>
+                          </button>
+                          <button
+                            onClick={(e) => deleteNote(note.id!, e)}
+                            className={`rounded-md p-1 opacity-0 transition-all group-hover:opacity-100 ${mutedTextColor} hover:text-red-500`}
+                            title="Delete note"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
