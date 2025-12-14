@@ -17,7 +17,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Betterwrite",
   description: "Write better with Betterwrite",
-  icons: [{ rel: "icon", url: "/icon.svg" }],
+  icons: [
+    {
+      rel: "icon",
+      url: "/light_logo.png",
+      media: "(prefers-color-scheme: light)",
+    },
+    {
+      rel: "icon",
+      url: "/dark_logo.png",
+      media: "(prefers-color-scheme: dark)",
+    },
+  ],
   openGraph: {
     images: ["/ogimage.png"],
   },

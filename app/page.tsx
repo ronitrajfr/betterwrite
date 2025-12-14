@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import Image from "next/image";
 import {
   Clock,
   Search,
@@ -44,6 +45,8 @@ export default function BetterWriteDB() {
   const [searchQuery, setSearchQuery] = useState("");
   const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 });
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
+  const [githubStars, setGithubStars] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   const { theme, setTheme } = useTheme();
 
@@ -130,6 +133,25 @@ export default function BetterWriteDB() {
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const fetchGitHubStars = async () => {
+      try {
+        const response = await fetch(
+          "https://api.github.com/repos/ronitrajfr/betterwrite"
+        );
+        const data = await response.json();
+        setGithubStars(data.stargazers_count);
+      } catch (error) {
+        console.error("Failed to fetch GitHub stars:", error);
+      }
+    };
+    fetchGitHubStars();
   }, []);
 
   useEffect(() => {
@@ -1081,7 +1103,7 @@ export default function BetterWriteDB() {
   const mutedTextColor = "text-muted-foreground";
   const borderColor = "border-border";
   const sidebarBg = "bg-background";
-  const sidebarBorder = "border-border/30";
+  const sidebarBorder = "border-border";
   const hoverBg = "hover:bg-accent";
   const buttonHover = "hover:text-foreground";
 
@@ -1250,8 +1272,11 @@ export default function BetterWriteDB() {
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                 className={`rounded-lg p-2 transition-colors ${hoverBg} ${buttonHover}`}
                 title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                suppressHydrationWarning
               >
-                {theme === "light" ? (
+                {!mounted ? (
+                  <Sun className="h-4 w-4" />
+                ) : theme === "light" ? (
                   <Moon className="h-4 w-4" />
                 ) : (
                   <Sun className="h-4 w-4" />
@@ -1305,19 +1330,36 @@ export default function BetterWriteDB() {
           <div className="flex w-full flex-col h-full animate-slideIn">
             <div className={`p-6 pb-4 ${bgColor}`}>
               <div className="flex items-center justify-between gap-3 mb-4">
-                <h2
-                  className={`text-lg font-light tracking-tight ${textColor}`}
-                >
-                  BetterWrite
-                </h2>
+                <div className="flex items-center gap-2.5">
+                  <Image
+                    src={
+                      theme === "dark" ? "/dark_logo.png" : "/light_logo.png"
+                    }
+                    alt="BetterWrite Logo"
+                    width={28}
+                    height={28}
+                    className="flex-shrink-0"
+                  />
+                  <h2
+                    className={`text-lg font-semibold tracking-tight ${textColor}`}
+                    style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                  >
+                    BetterWrite
+                  </h2>
+                </div>
                 <a
-                  href="https://github.com/ronitrajfr/betterwrite/fork"
+                  href="https://github.com/ronitrajfr/betterwrite"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`rounded-md p-1 transition-all ${mutedTextColor} hover:${textColor}`}
-                  title="Fork on GitHub"
+                  className={`flex items-center gap-1.5 rounded-md px-2 py-1 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
+                  title="Star on GitHub"
                 >
                   <Github className="h-3.5 w-3.5" />
+                  {githubStars !== null && (
+                    <span className="text-xs font-medium">
+                      {githubStars.toLocaleString()}
+                    </span>
+                  )}
                 </a>
               </div>
               <div className="relative">
