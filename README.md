@@ -1,4 +1,4 @@
-<h1 align="center">Say Hello to <a href="https://ayoni.vercel.app/">Betterwrite</a>
+<h1 align="center">Say Hello to <a href="https://betterwrite-one.vercel.app/">Betterwrite</a>
 </h1>
  <img width="1000" alt="header image" src="https://raw.githubusercontent.com/ronitrajfr/betterwrite/refs/heads/main/ogimage.png">
 
