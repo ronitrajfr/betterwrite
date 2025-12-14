@@ -935,7 +935,7 @@ export default function BetterWriteDB() {
     const saveNote = async () => {
       // Don't save if we're in the process of clearing the form
       if (isClearing) return;
-      
+
       if (!debouncedTitle.trim() && !debouncedContent.trim()) return;
 
       const now = new Date();
