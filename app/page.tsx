@@ -33,6 +33,7 @@ export default function BetterWriteDB() {
   const [allNotes, setAllNotes] = useState<Note[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 });
 
   const { theme, setTheme } = useTheme();
 
@@ -884,6 +885,32 @@ export default function BetterWriteDB() {
     setVimModeEnabled((prev) => !prev);
   };
 
+  const updateCursorPosition = useCallback(() => {
+    const textarea = textAreaRef.current;
+    if (!textarea || !vimModeEnabled || vimMode === "insert") return;
+
+    const position = textarea.selectionStart;
+    const textBeforeCursor = content.substring(0, position);
+    const lines = textBeforeCursor.split("\n");
+    const currentLineIndex = lines.length - 1;
+    const currentLineText = lines[currentLineIndex];
+
+    const lineHeight = fontSize * 1.8;
+    const top = currentLineIndex * lineHeight;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.font = `${fontSize}px ${getFontFamily()}`;
+      const left = ctx.measureText(currentLineText).width;
+      setCursorPosition({ top, left });
+    }
+  }, [content, vimModeEnabled, vimMode, fontSize, getFontFamily]);
+
+  useEffect(() => {
+    updateCursorPosition();
+  }, [updateCursorPosition]);
+
   const bgColor = "bg-background";
   const textColor = "text-foreground";
   const mutedTextColor = "text-muted-foreground";
@@ -913,22 +940,55 @@ export default function BetterWriteDB() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <textarea
-              ref={textAreaRef}
-              className={`min-h-[calc(100vh-240px)] w-full resize-none border-none bg-transparent ${textColor} outline-none placeholder:${mutedTextColor}`}
-              style={{
-                fontSize: `${fontSize}px`,
-                fontFamily: getFontFamily(),
-                lineHeight: "1.8",
-                cursor:
-                  vimModeEnabled && vimMode !== "insert" ? "default" : "text",
-              }}
-              placeholder={placeholder}
-              spellCheck={false}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              readOnly={vimModeEnabled && vimMode !== "insert"}
-            />
+            <div className="relative">
+              <textarea
+                ref={textAreaRef}
+                className={`min-h-[calc(100vh-240px)] w-full resize-none border-none bg-transparent ${textColor} outline-none placeholder:${mutedTextColor}`}
+                style={{
+                  fontSize: `${fontSize}px`,
+                  fontFamily: getFontFamily(),
+                  lineHeight: "1.8",
+                  caretColor:
+                    vimModeEnabled && vimMode !== "insert"
+                      ? "transparent"
+                      : "auto",
+                }}
+                placeholder={placeholder}
+                spellCheck={false}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onKeyUp={updateCursorPosition}
+                onClick={updateCursorPosition}
+                readOnly={vimModeEnabled && vimMode !== "insert"}
+              />
+
+              {/* Block cursor for Vim normal mode */}
+              {vimModeEnabled && vimMode !== "insert" && (
+                <div
+                  className="pointer-events-none absolute"
+                  style={{
+                    top: `${cursorPosition.top}px`,
+                    left: `${cursorPosition.left}px`,
+                    width: `${fontSize * 0.6}px`,
+                    height: `${fontSize * 1.8}px`,
+                    backgroundColor:
+                      vimMode === "normal"
+                        ? "rgba(59, 130, 246, 0.5)"
+                        : vimMode === "visual"
+                        ? "rgba(234, 179, 8, 0.5)"
+                        : "rgba(168, 85, 247, 0.5)",
+                    border: `2px solid ${
+                      vimMode === "normal"
+                        ? "rgb(59, 130, 246)"
+                        : vimMode === "visual"
+                        ? "rgb(234, 179, 8)"
+                        : "rgb(168, 85, 247)"
+                    }`,
+                    animation: "vim-cursor-blink 1s step-end infinite",
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
 
