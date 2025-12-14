@@ -53,7 +53,14 @@ export default function BetterWriteDB() {
     }
     return false;
   });
-  const [vimMode, setVimMode] = useState<VimMode>("normal");
+  const [vimMode, setVimMode] = useState<VimMode>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("betterwrite-vim-mode") === "true"
+        ? "normal"
+        : "insert";
+    }
+    return "normal";
+  });
   const [yankBuffer, setYankBuffer] = useState("");
   const [commandBuffer, setCommandBuffer] = useState("");
   const [history, setHistory] = useState<HistoryState[]>([]);
@@ -95,9 +102,6 @@ export default function BetterWriteDB() {
 
   useEffect(() => {
     localStorage.setItem("betterwrite-vim-mode", vimModeEnabled.toString());
-    if (vimModeEnabled) {
-      setVimMode("normal");
-    }
   }, [vimModeEnabled]);
 
   useEffect(() => {
@@ -974,12 +978,12 @@ export default function BetterWriteDB() {
     }
   }, [selectedFont]);
 
-  const handleNewEntry = () => {
+  const handleNewEntry = useCallback(() => {
     setTitle("");
     setContent("");
     setNoteId(null);
     if (textAreaRef.current) textAreaRef.current.value = "";
-  };
+  }, []);
 
   const loadNote = (note: Note) => {
     setTitle(note.title);
@@ -1007,7 +1011,7 @@ export default function BetterWriteDB() {
     }
   };
 
-  const toggleVimMode = () => {
+  const toggleVimMode = useCallback(() => {
     setVimModeEnabled((prev) => {
       if (!prev) {
         setVimMode("normal");
@@ -1016,7 +1020,7 @@ export default function BetterWriteDB() {
       }
       return !prev;
     });
-  };
+  }, []);
 
   useEffect(() => {
     updateCursorPosition();
@@ -1078,9 +1082,7 @@ export default function BetterWriteDB() {
   const borderColor = "border-border";
   const sidebarBg = "bg-background";
   const sidebarBorder = "border-border/30";
-  const inputBg = "bg-background";
   const hoverBg = "hover:bg-accent";
-  const activeBg = "bg-accent";
   const buttonHover = "hover:text-foreground";
 
   return (
