@@ -1081,7 +1081,6 @@ export default function BetterWriteDB() {
     }
   };
 
-
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
@@ -1426,7 +1425,11 @@ export default function BetterWriteDB() {
                     className={`flex items-center gap-1.5 text-xs ${textColor} hover:opacity-80`}
                   >
                     <div
-                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${selectedNotes.size === filteredNotes.length ? "bg-primary border-primary" : "border-muted-foreground"}`}
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
+                        selectedNotes.size === filteredNotes.length
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground"
+                      }`}
                     >
                       {selectedNotes.size === filteredNotes.length && (
                         <Check className="h-3 w-3 text-primary-foreground" />
@@ -1441,7 +1444,11 @@ export default function BetterWriteDB() {
                         setDeleteDialogOpen(true);
                       }}
                       disabled={selectedNotes.size === 0}
-                      className={`rounded-md p-1.5 transition-colors ${selectedNotes.size > 0 ? "text-red-500 hover:bg-red-500/10" : "text-muted-foreground opacity-50"}`}
+                      className={`rounded-md p-1.5 transition-colors ${
+                        selectedNotes.size > 0
+                          ? "text-red-500 hover:bg-red-500/10"
+                          : "text-muted-foreground opacity-50"
+                      }`}
                       title="Delete selected"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -1475,8 +1482,16 @@ export default function BetterWriteDB() {
                 {filteredNotes.length > 0 && (
                   <button
                     onClick={() => setIsSelectionMode(!isSelectionMode)}
-                    className={`rounded-md p-1.5 transition-colors ${isSelectionMode ? "bg-accent text-foreground" : `${mutedTextColor} hover:${textColor}`}`}
-                    title={isSelectionMode ? "Exit selection mode" : "Select multiple notes"}
+                    className={`rounded-md p-1.5 transition-colors ${
+                      isSelectionMode
+                        ? "bg-accent text-foreground"
+                        : `${mutedTextColor} hover:${textColor}`
+                    }`}
+                    title={
+                      isSelectionMode
+                        ? "Exit selection mode"
+                        : "Select multiple notes"
+                    }
                   >
                     <ListChecks className="h-3.5 w-3.5" />
                   </button>
@@ -1508,7 +1523,11 @@ export default function BetterWriteDB() {
                       <div
                         key={note.id}
                         className={`group relative transition-all duration-200 animate-fadeIn rounded-md mb-1 ${
-                          isActive ? "bg-accent/50" : isSelected ? "bg-accent/30" : ""
+                          isActive
+                            ? "bg-accent/50"
+                            : isSelected
+                            ? "bg-accent/30"
+                            : ""
                         }`}
                         style={{ animationDelay: `${index * 30}ms` }}
                       >
@@ -1711,12 +1730,18 @@ export default function BetterWriteDB() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {noteToDelete !== null ? "Delete Note?" : "Delete Multiple Notes?"}
+              {noteToDelete !== null
+                ? "Delete Note?"
+                : "Delete Multiple Notes?"}
             </DialogTitle>
             <DialogDescription>
               {noteToDelete !== null
                 ? "This action cannot be undone. This will permanently delete this note from your local storage."
-                : `This action cannot be undone. This will permanently delete ${selectedNotes.size} ${selectedNotes.size === 1 ? "note" : "notes"} from your local storage.`}
+                : `This action cannot be undone. This will permanently delete ${
+                    selectedNotes.size
+                  } ${
+                    selectedNotes.size === 1 ? "note" : "notes"
+                  } from your local storage.`}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
