@@ -84,6 +84,7 @@ export default function BetterWriteDB() {
   const [history, setHistory] = useState<HistoryState[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [pendingKey, setPendingKey] = useState("");
+  const [isClearing, setIsClearing] = useState(false);
 
   const [debouncedTitle] = useDebounce(title, 500);
   const [debouncedContent] = useDebounce(content, 500);
@@ -932,6 +933,9 @@ export default function BetterWriteDB() {
 
   useEffect(() => {
     const saveNote = async () => {
+      // Don't save if we're in the process of clearing the form
+      if (isClearing) return;
+      
       if (!debouncedTitle.trim() && !debouncedContent.trim()) return;
 
       const now = new Date();
@@ -957,7 +961,7 @@ export default function BetterWriteDB() {
     };
 
     saveNote();
-  }, [debouncedTitle, debouncedContent, noteId]);
+  }, [debouncedTitle, debouncedContent, noteId, isClearing]);
 
   const formatTime = () => {
     const hours = currentTime.getHours().toString().padStart(2, "0");
@@ -1016,16 +1020,22 @@ export default function BetterWriteDB() {
   }, [selectedFont]);
 
   const handleNewEntry = useCallback(() => {
+    setIsClearing(true);
     setTitle("");
     setContent("");
     setNoteId(null);
     if (textAreaRef.current) textAreaRef.current.value = "";
+    // Clear the flag after debounce delay to allow new content to be saved
+    setTimeout(() => setIsClearing(false), 600);
   }, []);
 
   const loadNote = (note: Note) => {
+    setIsClearing(true);
     setTitle(note.title);
     setContent(note.content);
     setNoteId(note.id || null);
+    // Clear the flag after debounce delay
+    setTimeout(() => setIsClearing(false), 600);
   };
 
   const deleteNote = async (noteIdToDelete: number, e: React.MouseEvent) => {
@@ -1269,7 +1279,9 @@ export default function BetterWriteDB() {
           className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-3`}
         >
           <div className="mx-auto flex max-w-6xl items-center justify-between flex-wrap gap-2">
-            <div className={`flex items-center gap-1 sm:gap-2 ${mutedTextColor} flex-wrap`}>
+            <div
+              className={`flex items-center gap-1 sm:gap-2 ${mutedTextColor} flex-wrap`}
+            >
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setFontSize((prev) => Math.max(prev - 2, 12))}
@@ -1309,7 +1321,9 @@ export default function BetterWriteDB() {
               </div>
             </div>
 
-            <div className={`flex items-center gap-1 sm:gap-2 ${mutedTextColor}`}>
+            <div
+              className={`flex items-center gap-1 sm:gap-2 ${mutedTextColor}`}
+            >
               <div
                 className={`hidden sm:flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 text-xs ${mutedTextColor}`}
               >
