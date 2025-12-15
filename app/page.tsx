@@ -1644,7 +1644,7 @@ export default function BetterWriteDB() {
                     <span className="text-sm font-semibold">
                       Buy me a coffee
                     </span>
-                    <span className="ml-0.5 rounded-full bg-background/20 px-2.5 py-0.5 text-sm font-medium backdrop-blur-sm transition-all duration-300 group-hover:bg-background/30 dark:bg-[#2d2d2d] dark:group-hover:bg-[#3d3d3d]">
+                    <span className="ml-0.5 rounded-full bg-accent  px-2.5 py-0.5 text-sm font-medium backdrop-blur-sm transition-all duration-300 group-hover:bg-background/30 dark:bg-[#2d2d2d] dark:group-hover:bg-[#3d3d3d]">
                       $5
                     </span>
                   </div>
