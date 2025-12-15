@@ -21,6 +21,7 @@ import {
   ListChecks,
   Check,
   X,
+  Coffee,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { db, type Note } from "@/lib/db";
@@ -1628,13 +1629,25 @@ export default function BetterWriteDB() {
                 <a
                   href="https://www.buymeacoffee.com/lirena00"
                   target="_blank"
-                  className="mx-auto my-auto"
+                  rel="noopener noreferrer"
+                  className="inline-block my-1"
                 >
-                  <img
-                    className="h-8 w-auto"
-                    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-                    alt="Buy Me A Coffee"
-                  />
+                  {/* Animated gradient overlay for light mode */}
+                  <div className="absolute inset-0  translate-y-full bg-linear-to-r from-foreground/90 to-foreground transition-transform duration-500 group-hover:translate-y-0 dark:hidden" />
+
+                  {/* Content */}
+                  <div className="relative z-10 flex items-center gap-2">
+                    <Coffee
+                      className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12"
+                      strokeWidth={2}
+                    />
+                    <span className="text-sm font-semibold">
+                      Buy me a coffee
+                    </span>
+                    <span className="ml-0.5 rounded-full bg-background/20 px-2.5 py-0.5 text-sm font-medium backdrop-blur-sm transition-all duration-300 group-hover:bg-background/30 dark:bg-[#2d2d2d] dark:group-hover:bg-[#3d3d3d]">
+                      $5
+                    </span>
+                  </div>
                 </a>
               </center>
             </div>
