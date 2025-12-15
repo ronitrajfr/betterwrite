@@ -1574,7 +1574,7 @@ export default function BetterWriteDB() {
                           {isSelectionMode && (
                             <button
                               onClick={() => toggleNoteSelection(note.id!)}
-                              className="flex-shrink-0 mt-0.5"
+                              className="shrink-0 my-auto mr-2"
                             >
                               <div
                                 className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
@@ -1608,7 +1608,7 @@ export default function BetterWriteDB() {
                           {!isSelectionMode && (
                             <button
                               onClick={(e) => deleteNote(note.id!, e)}
-                              className={`rounded-md p-1 opacity-0 transition-all group-hover:opacity-100 ${mutedTextColor} hover:text-red-500`}
+                              className={`rounded-md p-1 opacity-0 transition-all my-auto group-hover:opacity-100 ${mutedTextColor} hover:text-red-500`}
                               title="Delete note"
                             >
                               <Trash2 className="h-3.5 w-3.5" />
