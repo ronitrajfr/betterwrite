@@ -21,6 +21,7 @@ import {
   ListChecks,
   Check,
   X,
+  Coffee,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { db, type Note } from "@/lib/db";
@@ -1430,20 +1431,6 @@ export default function BetterWriteDB() {
                   </h2>
                 </div>
                 <div className="flex items-center gap-1">
-                  <a
-                    href="https://github.com/ronitrajfr/betterwrite"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center gap-1 sm:gap-1.5 rounded-md px-1.5 sm:px-2 py-1 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
-                    title="Star on GitHub"
-                  >
-                    <Github className="h-3.5 w-3.5" />
-                    {githubStars !== null && (
-                      <span className="hidden sm:inline text-xs font-medium">
-                        {githubStars.toLocaleString()}
-                      </span>
-                    )}
-                  </a>
                   <button
                     onClick={() => setIsSidebarOpen(false)}
                     className={`md:hidden rounded-md p-1 transition-colors ${mutedTextColor} hover:${textColor}`}
@@ -1620,6 +1607,52 @@ export default function BetterWriteDB() {
                   })}
                 </div>
               )}
+            </div>
+            <div
+              className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 md:px-6 py-2 sm:py-3 sticky bottom-0 w-full`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                {/* GitHub Stars */}
+                <a
+                  href="https://github.com/ronitrajfr/betterwrite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center justify-center gap-1.5 flex-1 rounded-md px-2 py-1.5 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
+                  title="Star on GitHub"
+                >
+                  <Github className="h-4 w-4" strokeWidth={2} />
+                  <span className="text-sm font-medium hidden sm:inline">
+                    Star
+                  </span>
+                  {githubStars !== null && (
+                    <span
+                      className={`rounded-full bg-accent px-2 py-0.5 text-xs font-medium ${textColor}`}
+                    >
+                      {githubStars.toLocaleString()}
+                    </span>
+                  )}
+                </a>
+                {/* Divider */}
+                <div className={`h-6 w-px ${borderColor}`} />
+                {/* Buy me a coffee */}
+                <a
+                  href="https://www.buymeacoffee.com/lirena00"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center justify-center gap-1.5 flex-1 rounded-md px-2 py-1.5 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
+                  title="Support this project"
+                >
+                  <Coffee className="h-4 w-4" strokeWidth={2} />
+                  <span className="text-sm font-medium hidden sm:inline">
+                    Sponsor
+                  </span>
+                  <span
+                    className={`rounded-full bg-accent px-2 py-0.5 text-xs font-medium ${textColor}`}
+                  >
+                    $5
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         )}
