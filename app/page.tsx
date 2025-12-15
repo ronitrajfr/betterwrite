@@ -1621,6 +1621,23 @@ export default function BetterWriteDB() {
                 </div>
               )}
             </div>
+            <div
+              className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md md:px-6 py-2 sm:py-3 sticky bottom-0 w-full`}
+            >
+              <center>
+                <a
+                  href="https://www.buymeacoffee.com/lirena00"
+                  target="_blank"
+                  className="mx-auto my-auto"
+                >
+                  <img
+                    className="h-8 w-auto"
+                    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                    alt="Buy Me A Coffee"
+                  />
+                </a>
+              </center>
+            </div>
           </div>
         )}
       </div>
