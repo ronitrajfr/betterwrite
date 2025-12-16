@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import Image from "next/image";
 import {
@@ -15,7 +17,7 @@ import {
   ZoomIn,
   ZoomOut,
   Type,
-  Command as CommandIcon,
+  CommandIcon,
   PanelRight,
   Github,
   ListChecks,
@@ -46,8 +48,19 @@ interface HistoryState {
 }
 
 export default function BetterWriteDB() {
-  const [fontSize, setFontSize] = useState(18);
-  const [selectedFont, setSelectedFont] = useState("Lato");
+  const [fontSize, setFontSize] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("betterwrite-font-size");
+      return saved ? Number.parseInt(saved, 10) : 18;
+    }
+    return 18;
+  });
+  const [selectedFont, setSelectedFont] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("betterwrite-font") || "Lato";
+    }
+    return "Lato";
+  });
   const [currentTime, setCurrentTime] = useState(new Date());
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -90,6 +103,7 @@ export default function BetterWriteDB() {
   const [debouncedTitle] = useDebounce(title, 500);
   const [debouncedContent] = useDebounce(content, 500);
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const [debouncedFontSize] = useDebounce(fontSize, 500);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -123,6 +137,21 @@ export default function BetterWriteDB() {
   useEffect(() => {
     localStorage.setItem("betterwrite-vim-mode", vimModeEnabled.toString());
   }, [vimModeEnabled]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        "betterwrite-font-size",
+        debouncedFontSize.toString()
+      );
+    }
+  }, [debouncedFontSize]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("betterwrite-font", selectedFont);
+    }
+  }, [selectedFont]);
 
   useEffect(() => {
     if (!vimModeEnabled || vimMode !== "insert") return;
@@ -1431,6 +1460,20 @@ export default function BetterWriteDB() {
                   </h2>
                 </div>
                 <div className="flex items-center gap-1">
+                  <a
+                    href="https://github.com/ronitrajfr/betterwrite"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center gap-1 sm:gap-1.5 rounded-md px-1.5 sm:px-2 py-1 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
+                    title="Star on GitHub"
+                  >
+                    <Github className="h-3.5 w-3.5" />
+                    {githubStars !== null && (
+                      <span className="hidden sm:inline text-xs font-medium">
+                        {githubStars.toLocaleString()}
+                      </span>
+                    )}
+                  </a>
                   <button
                     onClick={() => setIsSidebarOpen(false)}
                     className={`md:hidden rounded-md p-1 transition-colors ${mutedTextColor} hover:${textColor}`}
@@ -1564,7 +1607,7 @@ export default function BetterWriteDB() {
                               className="shrink-0 my-auto mr-2"
                             >
                               <div
-                                className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                                className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
                                   isSelected
                                     ? "bg-primary border-primary"
                                     : "border-muted-foreground"
@@ -1609,50 +1652,33 @@ export default function BetterWriteDB() {
               )}
             </div>
             <div
-              className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 md:px-6 py-2 sm:py-3 sticky bottom-0 w-full`}
+              className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md md:px-6 py-2 sm:py-3 sticky bottom-0 w-full`}
             >
-              <div className="flex items-center justify-between gap-2">
-                {/* GitHub Stars */}
-                <a
-                  href="https://github.com/ronitrajfr/betterwrite"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center justify-center gap-1.5 flex-1 rounded-md px-2 py-1.5 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
-                  title="Star on GitHub"
-                >
-                  <Github className="h-4 w-4" strokeWidth={2} />
-                  <span className="text-sm font-medium hidden sm:inline">
-                    Star
-                  </span>
-                  {githubStars !== null && (
-                    <span
-                      className={`rounded-full bg-accent px-2 py-0.5 text-xs font-medium ${textColor}`}
-                    >
-                      {githubStars.toLocaleString()}
-                    </span>
-                  )}
-                </a>
-                {/* Divider */}
-                <div className={`h-6 w-px ${borderColor}`} />
-                {/* Buy me a coffee */}
+              <center>
                 <a
                   href="https://www.buymeacoffee.com/lirena00"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center justify-center gap-1.5 flex-1 rounded-md px-2 py-1.5 transition-all ${mutedTextColor} hover:${textColor} hover:bg-accent`}
-                  title="Support this project"
+                  className="inline-block my-1"
                 >
-                  <Coffee className="h-4 w-4" strokeWidth={2} />
-                  <span className="text-sm font-medium hidden sm:inline">
-                    Sponsor
-                  </span>
-                  <span
-                    className={`rounded-full bg-accent px-2 py-0.5 text-xs font-medium ${textColor}`}
-                  >
-                    $5
-                  </span>
+                  {/* Animated gradient overlay for light mode */}
+                  <div className="absolute inset-0  translate-y-full bg-linear-to-r from-foreground/90 to-foreground transition-transform duration-500 group-hover:translate-y-0 dark:hidden" />
+
+                  {/* Content */}
+                  <div className="relative z-10 flex items-center gap-2">
+                    <Coffee
+                      className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12"
+                      strokeWidth={2}
+                    />
+                    <span className="text-sm font-semibold">
+                      Buy me a coffee
+                    </span>
+                    <span className="ml-0.5 rounded-full bg-accent  px-2.5 py-0.5 text-sm font-medium backdrop-blur-sm transition-all duration-300 group-hover:bg-background/30 dark:bg-[#2d2d2d] dark:group-hover:bg-[#3d3d3d]">
+                      $5
+                    </span>
+                  </div>
                 </a>
-              </div>
+              </center>
             </div>
           </div>
         )}
