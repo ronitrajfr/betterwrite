@@ -1164,7 +1164,8 @@ export default function BetterWriteDB() {
     };
 
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
   // Handle footer visibility on mouse move in fullscreen
@@ -1267,7 +1268,15 @@ export default function BetterWriteDB() {
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [vimModeEnabled, vimMode, theme, handleNewEntry, toggleVimMode, setTheme, toggleFullscreen]);
+  }, [
+    vimModeEnabled,
+    vimMode,
+    theme,
+    handleNewEntry,
+    toggleVimMode,
+    setTheme,
+    toggleFullscreen,
+  ]);
 
   const bgColor = "bg-background";
   const textColor = "text-foreground";
