@@ -16,6 +16,7 @@ import {
   Trash2,
   ZoomIn,
   ZoomOut,
+  Download,
   Type,
   CommandIcon,
   PanelRight,
@@ -105,7 +106,10 @@ export default function BetterWriteDB() {
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const [debouncedFontSize] = useDebounce(fontSize, 500);
 
+  // const [exportDialogOpen, setExportDialogOpen] = useState(false);
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const titleInputRef = useRef<HTMLInputElement>(null);
 
   const placeholders = useMemo(
     () => [
@@ -1055,6 +1059,8 @@ export default function BetterWriteDB() {
     setContent("");
     setNoteId(null);
     if (textAreaRef.current) textAreaRef.current.value = "";
+    if (titleInputRef.current) titleInputRef.current.value = "";
+
     // Clear the flag after debounce delay to allow new content to be saved
     setTimeout(() => setIsClearing(false), 600);
   }, []);
@@ -1144,6 +1150,28 @@ export default function BetterWriteDB() {
     updateCursorPosition();
   }, [updateCursorPosition]);
 
+  const exportNote = useCallback(() => {
+    // Get the current content and title directly from the inputs to avoid debounce issues
+    const currentContent = textAreaRef.current?.value || content;
+    const currentTitle = titleInputRef.current?.value || title;
+
+    if (!currentTitle.trim() && !currentContent.trim()) {
+      alert("Cannot export an empty note");
+      return;
+    }
+
+    const noteTitle = currentTitle.trim() || "Untitled";
+    const noteContent = `# ${noteTitle}\n\n${currentContent}`;
+    const blob = new Blob([noteContent], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${noteTitle.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [title, content]);
   // Command menu keybinding - only active when vim mode is disabled or in insert mode
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -1188,6 +1216,12 @@ export default function BetterWriteDB() {
         e.preventDefault();
         setFontSize((prev) => Math.min(prev + 2, 48));
       }
+
+      //Ctrl+E - Export note
+      if (e.key === "e" && e.ctrlKey && !e.shiftKey && !e.metaKey) {
+        e.preventDefault();
+        exportNote();
+      }
     };
 
     document.addEventListener("keydown", down);
@@ -1211,6 +1245,7 @@ export default function BetterWriteDB() {
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12 scrollbar-hide">
           <div className="mx-auto max-w-4xl">
             <input
+              ref={titleInputRef}
               type="text"
               className={`mb-6 sm:mb-8 md:mb-12 w-full resize-none border-none bg-transparent font-bold ${textColor} outline-none placeholder:${mutedTextColor} transition-all`}
               style={{
@@ -1363,6 +1398,13 @@ export default function BetterWriteDB() {
                 </span>
               </div>
               <div className="hidden sm:block mx-1 h-4 w-px bg-border" />
+              <button
+                onClick={exportNote}
+                className={`rounded-lg p-1.5 sm:p-2 transition-colors ${hoverBg} ${buttonHover}`}
+                title="Export note (Ctrl+E)"
+              >
+                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </button>
               <button
                 onClick={() => setCommandMenuOpen(true)}
                 className={`hidden sm:flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs transition-colors ${hoverBg} ${buttonHover}`}
@@ -1739,6 +1781,16 @@ export default function BetterWriteDB() {
               <kbd>Ctrl+Shift+V</kbd>
             </Command.Item>
           </Command.Group>
+          <Command.Item
+            onSelect={() => {
+              exportNote();
+              setCommandMenuOpen(false);
+            }}
+          >
+            <Download className="h-4 w-4" />
+            <span>Export Note</span>
+            <kbd>Ctrl+E</kbd>
+          </Command.Item>
 
           <Command.Group heading="Font Size">
             <Command.Item
