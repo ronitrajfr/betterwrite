@@ -39,7 +39,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const FONTS = ["Lato", "Inter", "System", "Georgia", "JetBrains Mono"];
+const FONTS = ["Lato", "Inter", "System", "Ovo", "JetBrains Mono"];
 
 type VimMode = "normal" | "insert" | "visual" | "command";
 
@@ -77,6 +77,8 @@ export default function BetterWriteDB() {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { theme, setTheme } = useTheme();
 
@@ -662,8 +664,8 @@ export default function BetterWriteDB() {
             return "Inter, system-ui, sans-serif";
           case "System":
             return "system-ui, -apple-system, sans-serif";
-          case "Georgia":
-            return "Georgia, serif";
+          case "Ovo":
+            return "Ovo, serif";
           case "JetBrains Mono":
             return "'JetBrains Mono', 'Courier New', monospace";
           default:
@@ -1044,8 +1046,8 @@ export default function BetterWriteDB() {
         return "Inter, system-ui, sans-serif";
       case "System":
         return "system-ui, -apple-system, sans-serif";
-      case "Georgia":
-        return "Georgia, serif";
+      case "Ovo":
+        return "Ovo, serif";
       case "JetBrains Mono":
         return "'JetBrains Mono', 'Courier New', monospace";
       default:
@@ -1156,7 +1158,8 @@ export default function BetterWriteDB() {
     const currentTitle = titleInputRef.current?.value || title;
 
     if (!currentTitle.trim() && !currentContent.trim()) {
-      alert("Cannot export an empty note");
+      setErrorMessage("Cannot export an empty note");
+      setErrorDialogOpen(true);
       return;
     }
 
@@ -1914,6 +1917,24 @@ export default function BetterWriteDB() {
               className="rounded-lg bg-red-500 px-4 py-2 text-sm text-white transition-colors hover:bg-red-600"
             >
               Delete
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error/Warning Dialog */}
+      <Dialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Notice</DialogTitle>
+            <DialogDescription>{errorMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              onClick={() => setErrorDialogOpen(false)}
+              className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              OK
             </button>
           </DialogFooter>
         </DialogContent>
