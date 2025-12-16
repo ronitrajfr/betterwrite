@@ -12,6 +12,7 @@ import {
   Terminal,
   Plus,
   Maximize2,
+  Minimize2,
   FileText,
   Trash2,
   ZoomIn,
@@ -39,7 +40,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const FONTS = ["Lato", "Inter", "System", "Georgia", "JetBrains Mono"];
+const FONTS = ["Lato", "Inter", "System", "Ovo", "JetBrains Mono"];
 
 type VimMode = "normal" | "insert" | "visual" | "command";
 
@@ -77,6 +78,10 @@ export default function BetterWriteDB() {
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showFooter, setShowFooter] = useState(true);
 
   const { theme, setTheme } = useTheme();
 
@@ -662,8 +667,8 @@ export default function BetterWriteDB() {
             return "Inter, system-ui, sans-serif";
           case "System":
             return "system-ui, -apple-system, sans-serif";
-          case "Georgia":
-            return "Georgia, serif";
+          case "Ovo":
+            return "Ovo, serif";
           case "JetBrains Mono":
             return "'JetBrains Mono', 'Courier New', monospace";
           default:
@@ -1044,8 +1049,8 @@ export default function BetterWriteDB() {
         return "Inter, system-ui, sans-serif";
       case "System":
         return "system-ui, -apple-system, sans-serif";
-      case "Georgia":
-        return "Georgia, serif";
+      case "Ovo":
+        return "Ovo, serif";
       case "JetBrains Mono":
         return "'JetBrains Mono', 'Courier New', monospace";
       default:
@@ -1130,8 +1135,10 @@ export default function BetterWriteDB() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
+      setIsFullscreen(false);
     }
   };
 
@@ -1150,13 +1157,42 @@ export default function BetterWriteDB() {
     updateCursorPosition();
   }, [updateCursorPosition]);
 
+  // Track fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  // Handle footer visibility on mouse move in fullscreen
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowFooter(true);
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const threshold = 100; // Show footer when mouse is within 100px of bottom
+      const distanceFromBottom = window.innerHeight - e.clientY;
+      setShowFooter(distanceFromBottom <= threshold);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [isFullscreen]);
+
   const exportNote = useCallback(() => {
     // Get the current content and title directly from the inputs to avoid debounce issues
     const currentContent = textAreaRef.current?.value || content;
     const currentTitle = titleInputRef.current?.value || title;
 
     if (!currentTitle.trim() && !currentContent.trim()) {
-      alert("Cannot export an empty note");
+      setErrorMessage("Cannot export an empty note");
+      setErrorDialogOpen(true);
       return;
     }
 
@@ -1222,11 +1258,25 @@ export default function BetterWriteDB() {
         e.preventDefault();
         exportNote();
       }
+
+      // F11 - Toggle fullscreen
+      if (e.key === "F11") {
+        e.preventDefault();
+        toggleFullscreen();
+      }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [vimModeEnabled, vimMode, theme, handleNewEntry, toggleVimMode, setTheme]);
+  }, [
+    vimModeEnabled,
+    vimMode,
+    theme,
+    handleNewEntry,
+    toggleVimMode,
+    setTheme,
+    toggleFullscreen,
+  ]);
 
   const bgColor = "bg-background";
   const textColor = "text-foreground";
@@ -1341,7 +1391,9 @@ export default function BetterWriteDB() {
         )}
 
         <footer
-          className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-3`}
+          className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-3 transition-transform duration-300 ${
+            isFullscreen && !showFooter ? "translate-y-full" : "translate-y-0"
+          }`}
         >
           <div className="mx-auto flex max-w-6xl items-center justify-between flex-wrap gap-2">
             <div
@@ -1449,7 +1501,11 @@ export default function BetterWriteDB() {
                 className={`hidden md:flex rounded-lg p-1.5 sm:p-2 transition-colors ${hoverBg} ${buttonHover}`}
                 title="Toggle fullscreen"
               >
-                <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                {isFullscreen ? (
+                  <Minimize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                ) : (
+                  <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                )}
               </button>
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -1914,6 +1970,24 @@ export default function BetterWriteDB() {
               className="rounded-lg bg-red-500 px-4 py-2 text-sm text-white transition-colors hover:bg-red-600"
             >
               Delete
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error/Warning Dialog */}
+      <Dialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Notice</DialogTitle>
+            <DialogDescription>{errorMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              onClick={() => setErrorDialogOpen(false)}
+              className="rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              OK
             </button>
           </DialogFooter>
         </DialogContent>
