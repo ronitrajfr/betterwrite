@@ -12,6 +12,7 @@ import {
   Terminal,
   Plus,
   Maximize2,
+  Minimize2,
   FileText,
   Trash2,
   ZoomIn,
@@ -79,6 +80,8 @@ export default function BetterWriteDB() {
   const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showFooter, setShowFooter] = useState(true);
 
   const { theme, setTheme } = useTheme();
 
@@ -1132,8 +1135,10 @@ export default function BetterWriteDB() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
     } else {
       document.exitFullscreen();
+      setIsFullscreen(false);
     }
   };
 
@@ -1151,6 +1156,33 @@ export default function BetterWriteDB() {
   useEffect(() => {
     updateCursorPosition();
   }, [updateCursorPosition]);
+
+  // Track fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  // Handle footer visibility on mouse move in fullscreen
+  useEffect(() => {
+    if (!isFullscreen) {
+      setShowFooter(true);
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const threshold = 100; // Show footer when mouse is within 100px of bottom
+      const distanceFromBottom = window.innerHeight - e.clientY;
+      setShowFooter(distanceFromBottom <= threshold);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [isFullscreen]);
 
   const exportNote = useCallback(() => {
     // Get the current content and title directly from the inputs to avoid debounce issues
@@ -1225,11 +1257,17 @@ export default function BetterWriteDB() {
         e.preventDefault();
         exportNote();
       }
+
+      // F11 - Toggle fullscreen
+      if (e.key === "F11") {
+        e.preventDefault();
+        toggleFullscreen();
+      }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [vimModeEnabled, vimMode, theme, handleNewEntry, toggleVimMode, setTheme]);
+  }, [vimModeEnabled, vimMode, theme, handleNewEntry, toggleVimMode, setTheme, toggleFullscreen]);
 
   const bgColor = "bg-background";
   const textColor = "text-foreground";
@@ -1344,7 +1382,9 @@ export default function BetterWriteDB() {
         )}
 
         <footer
-          className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-3`}
+          className={`border-t ${borderColor} ${bgColor}/80 backdrop-blur-md px-3 sm:px-4 md:px-6 py-2 sm:py-3 transition-transform duration-300 ${
+            isFullscreen && !showFooter ? "translate-y-full" : "translate-y-0"
+          }`}
         >
           <div className="mx-auto flex max-w-6xl items-center justify-between flex-wrap gap-2">
             <div
@@ -1452,7 +1492,11 @@ export default function BetterWriteDB() {
                 className={`hidden md:flex rounded-lg p-1.5 sm:p-2 transition-colors ${hoverBg} ${buttonHover}`}
                 title="Toggle fullscreen"
               >
-                <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                {isFullscreen ? (
+                  <Minimize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                ) : (
+                  <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                )}
               </button>
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
