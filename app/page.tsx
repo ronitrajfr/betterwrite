@@ -1289,7 +1289,8 @@ export default function BetterWriteDB() {
 
   return (
     <div
-      className={`flex h-screen overflow-hidden ${bgColor} transition-colors duration-200`}
+      className={`flex overflow-hidden ${bgColor} transition-colors duration-200`}
+      style={{ height: "100svh" }}
     >
       <div className="flex flex-1 flex-col h-full">
         <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-12 scrollbar-hide">
@@ -1311,7 +1312,7 @@ export default function BetterWriteDB() {
             <div className="relative">
               <textarea
                 ref={textAreaRef}
-                className={`min-h-[calc(100vh-200px)] sm:min-h-[calc(100vh-240px)] w-full resize-none border-none bg-transparent ${textColor} outline-none placeholder:${mutedTextColor} transition-all`}
+                className={`min-h-[calc(100svh-200px)] sm:min-h-[calc(100svh-240px)] w-full resize-none border-none bg-transparent ${textColor} outline-none placeholder:${mutedTextColor} transition-all`}
                 style={{
                   fontSize: `${fontSize}px`,
                   fontFamily: getFontFamily(),
